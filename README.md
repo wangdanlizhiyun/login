@@ -29,7 +29,7 @@
                 Toast.makeText(this,"点赞",Toast.LENGTH_SHORT).show();
             }
    ```
-   
+   当登录状态发生改变时调用LoginUtil.login(b);
    如此这般，在登录后会自动执行原有的逻辑代码
    
  混淆
