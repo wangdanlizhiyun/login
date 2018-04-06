@@ -79,7 +79,11 @@ public class HookAmsUtil {
                         LoginUtil.mRemoteMethodBean = null;
                     }
                     intent.putExtra("component", intent.getComponent());
-                    intent.setComponent(new ComponentName(LoginUtil.mApplication, ProxyActivity.class));
+
+                    Class proxyActicityClass = LoginUtil.getProxyActivityClass();
+                    if (proxyActicityClass != null){
+                        intent.setComponent(new ComponentName(LoginUtil.mApplication, proxyActicityClass));
+                    }
                 }
             }
             return method.invoke(iActivityManagerObj, args);

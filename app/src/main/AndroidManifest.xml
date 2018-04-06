@@ -16,9 +16,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.lzy.login_library.ProxyActivity"/>
-
-        <activity android:name=".LoginActivity"/>
     </application>
 
 </manifest>

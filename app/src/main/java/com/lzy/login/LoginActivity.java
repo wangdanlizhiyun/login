@@ -13,7 +13,7 @@ import com.lzy.login_library.LoginUtil;
  * Created by lizhiyun on 2018/4/5.
  */
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

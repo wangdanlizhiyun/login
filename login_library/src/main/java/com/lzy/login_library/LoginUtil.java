@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import java.lang.ref.WeakReference;
@@ -16,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginUtil {
 
-    static Application mApplication;
+    public static Application mApplication;
     static Class mLoginActivityClass;
     static SharedPreferences mSharedPreferences = null;
     public static RemoteMethodBean mRemoteMethodBean;
@@ -91,6 +93,18 @@ public class LoginUtil {
         if (activity != null){
             activity.startActivity(new Intent(activity,mLoginActivityClass));
         }
+    }
+
+    public static Class getProxyActivityClass(){
+        try {
+            ActivityInfo[] activities = LoginUtil.mApplication.getPackageManager().getPackageInfo(LoginUtil.mApplication.getPackageName(), PackageManager.GET_ACTIVITIES).activities;
+            if (activities != null && activities.length > 0){
+                return Thread.currentThread().getContextClassLoader().loadClass(activities[0].name);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
