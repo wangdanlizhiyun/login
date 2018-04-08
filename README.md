@@ -1,4 +1,4 @@
-# 该library用于封装登录逻辑，实现0重复代码登录
+# 该library基于ams的hook和aop封装登录逻辑，实现0重复代码登录
  1。需要登录的功能分为2类，一：进入需要登录后的页面。二：需要登录后操作的功能如点赞，弹出漂亮对话框等。
  第一种在相应界面的activity上加CheckIfLoginAndLoginAndBackToContinue注解即可实现该界面任何跳转逻辑的拦截。（注：当其继承AppCompatActivity时需要在配置文件注册，其它可以省略注册）
  第二种在点击方法上加注解即可
