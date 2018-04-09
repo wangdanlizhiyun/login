@@ -63,8 +63,9 @@
             }
    ```
    当登录状态发生改变时调用
-   ```//模拟主线程触发
-      //                LoginUtil.login(true);
+   ```
+                        //模拟主线程触发
+        //                LoginUtil.login(true);
       
                       //模拟子线程触发
                       new Thread(new Runnable() {
