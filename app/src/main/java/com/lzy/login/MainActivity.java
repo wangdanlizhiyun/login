@@ -1,13 +1,10 @@
 package com.lzy.login;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.lzy.login_library.LoginUtil;
 import com.lzy.login_library.annotation.CheckIfLoginAndLoginAndBackToContinue;
@@ -39,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
+    //执行点赞的具体代码
     @CheckIfLoginAndLoginAndBackToContinue
     private void doZan() {
         Log.e("test","点赞 in "+Thread.currentThread().getName());
