@@ -23,7 +23,16 @@ public class LoginActivity extends Activity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginUtil.login(true);
+                //模拟主线程触发
+//                LoginUtil.login(true);
+
+                //模拟子线程触发
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LoginUtil.login(true);
+                    }
+                }).start();
                 setResult(RESULT_OK);
                 finish();
             }

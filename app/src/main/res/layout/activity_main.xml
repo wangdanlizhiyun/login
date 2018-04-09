@@ -10,8 +10,13 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="前往个人中心"
-        android:onClick="userProfile"/>
+        android:text="点默认头像前往个人中心"
+        android:onClick="userProfilePhoto"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点默认名称前往个人中心"
+        android:onClick="userProfileName"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

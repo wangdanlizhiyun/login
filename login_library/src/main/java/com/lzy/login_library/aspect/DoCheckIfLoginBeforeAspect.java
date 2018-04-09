@@ -1,9 +1,12 @@
 
 package com.lzy.login_library.aspect;
 
+import android.os.Looper;
+import android.util.Log;
+import android.util.LruCache;
+
 import com.lzy.login_library.LoginUtil;
 import com.lzy.login_library.RemoteMethodBean;
-import com.lzy.login_library.annotation.CheckIfLoginAndLoginAndBackToContinue;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,24 +21,34 @@ import java.lang.reflect.Method;
 public class DoCheckIfLoginBeforeAspect {
 
     @Pointcut("execution(@com.lzy.login_library.annotation.CheckIfLoginAndLoginAndBackToContinue * *(..))")
-    public void executeDoCheckIfLoginBeforeAspect() {
-    }
+    public void executeDoCheckIfLoginBeforeAspect() {}
 
     @Around("executeDoCheckIfLoginBeforeAspect()")
     public Object beforeJoinPoint(final ProceedingJoinPoint joinPoint) throws Throwable {
         Object result = null;
+        LoginUtil.setmRemoteMethodBean(null);
         Object target = joinPoint.getTarget();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         final Method currentMethod = methodSignature.getMethod();
-        CheckIfLoginAndLoginAndBackToContinue checkIfLogin = currentMethod.getAnnotation(CheckIfLoginAndLoginAndBackToContinue.class);
-        LoginUtil.mRemoteMethodBean = null;
         if (LoginUtil.isLogined()) {
             result = joinPoint.proceed();
         } else {
             LoginUtil.gotoLogin();
-            LoginUtil.mRemoteMethodBean = new RemoteMethodBean(target,currentMethod,joinPoint.getArgs());
+            LoginUtil.setmRemoteMethodBean(new RemoteMethodBean(target,currentMethod,joinPoint.getArgs()));
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                try{
+                    synchronized (LoginUtil.getObjectForThread(Thread.currentThread().hashCode())){
+                        LoginUtil.getObjectForThread(Thread.currentThread().hashCode()).wait();
+                        joinPoint.proceed();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
         }
         return result;
     }
+
+
 
 }

@@ -27,7 +27,6 @@ public class HookAmsUtil {
                 Class<?> singletonClass = Class.forName("android.util.Singleton");
                 Class<?> IActivityManagerClass = Class.forName("android.app.IActivityManager");
                 Object IActivityManagerSingleton = FieldUtil.getDeclaredFieldObject(activityManagerClass, "IActivityManagerSingleton", null);
-
                 Field mInstanceField = singletonClass.getDeclaredField("mInstance");
                 mInstanceField.setAccessible(true);
                 Object mInstance = mInstanceField.get(IActivityManagerSingleton);
@@ -62,8 +61,6 @@ public class HookAmsUtil {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-            Log.w("test","invoke "+method.getName());
             if ("startActivity".equals(method.getName())) {
                 Intent intent = null;
                 for (int i = 0; i < args.length; i++) {
@@ -74,12 +71,11 @@ public class HookAmsUtil {
                 }
                 if (intent != null) {
                     if (hasLoginAnnotation(intent.getComponent().getClassName())){
-                        LoginUtil.mRemoteMethodBean = new RemoteMethodBean(iActivityManagerObj,method,args);
+                        LoginUtil.setmRemoteMethodBean(new RemoteMethodBean(iActivityManagerObj,method,args));
                     }else {
-                        LoginUtil.mRemoteMethodBean = null;
+                        LoginUtil.setmRemoteMethodBean(null);
                     }
                     intent.putExtra("component", intent.getComponent());
-
                     Class proxyActicityClass = LoginUtil.getProxyActivityClass();
                     if (proxyActicityClass != null){
                         intent.setComponent(new ComponentName(LoginUtil.mApplication, proxyActicityClass));
@@ -131,9 +127,7 @@ public class HookAmsUtil {
                     if (componentName == null) {
                         return;
                     }
-                    Log.w("test","handlerLaunchActivity "+componentName.getClassName());
                     Boolean isNeedGotoLogin = false;
-
                     isNeedGotoLogin = !LoginUtil.isLogined() && hasLoginAnnotation(componentName.getClassName());
                     if (isNeedGotoLogin) {
                         intent.setComponent(new ComponentName(LoginUtil.mApplication, LoginUtil.mLoginActivityClass));

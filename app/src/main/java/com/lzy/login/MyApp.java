@@ -10,9 +10,11 @@ import com.lzy.login_library.LoginUtil;
  */
 
 public class MyApp extends Application {
+    static MyApp myApp;
     @Override
     public void onCreate() {
         super.onCreate();
+        myApp = this;
         LoginUtil.init(this,LoginActivity.class);
     }
 }
