@@ -6,8 +6,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
-import java.util.logging.LogRecord;
-
 /**
  * Created by lizhiyun on 2018/4/10.
  */

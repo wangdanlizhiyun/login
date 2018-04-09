@@ -34,7 +34,6 @@ public class RemoteMethodBean {
         }else {
             synchronized (LoginUtil.getObjectForThread(currentThreadCode)){
                 LoginUtil.getObjectForThread(currentThreadCode).notify();
-                Log.e("test","唤醒子线程"+currentThreadCode);
             }
         }
 
