@@ -143,6 +143,7 @@ public class LoginUtil {
                 if (mActivityOnDestroyListenerArrayMap.get(activity) != null) {
                     mActivityOnDestroyListenerArrayMap.get(activity).onDestroy();
                 }
+                mActivityOnDestroyListenerArrayMap.remove(activity);
             }
         });
         HookAmsUtil.hookStartActivity();
