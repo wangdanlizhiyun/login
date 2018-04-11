@@ -20,13 +20,29 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="点赞"
-        android:onClick="zan"/>
+        android:text="ui线程拦截点赞"
+        android:onClick="ui线程拦截点赞"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="多子线程拦截点赞"
+        android:onClick="多子线程拦截点赞"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ui线程和多子线程混合拦截点赞"
+        android:onClick="ui线程和多子线程混合拦截点赞"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="退出登录"
         android:onClick="logout"/>
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
 </LinearLayout>

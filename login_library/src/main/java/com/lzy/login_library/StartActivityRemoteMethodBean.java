@@ -8,29 +8,24 @@ import java.lang.reflect.Method;
 
 /**
  * Created by lizhiyun on 2017/4/15.
- * 用于非页面跳转的拦截，记录ui线程拦截的方法和唤醒拦截时被阻塞的子线程
+ *用于记录拦截的startactivity的方法，等登录后自动触发原操作
  */
 
-public class RemoteMethodBean {
+public class StartActivityRemoteMethodBean {
     private Object target;
     private Method method;
     private Object[] objects;
-    private static volatile RemoteMethodBean instance;
-    private OnDestroyListener onDestroyListener;
+    private static volatile StartActivityRemoteMethodBean instance;
 
-    public OnDestroyListener getOnDestroyListener() {
-        return onDestroyListener;
-    }
-
-    private RemoteMethodBean() {
+    private StartActivityRemoteMethodBean() {
 
     }
 
-    public static RemoteMethodBean getInstance() {
+    public static StartActivityRemoteMethodBean getInstance() {
         if (instance == null) {
-            synchronized (RemoteMethodBean.class) {
+            synchronized (StartActivityRemoteMethodBean.class) {
                 if (instance == null) {
-                    instance = new RemoteMethodBean();
+                    instance = new StartActivityRemoteMethodBean();
                 }
             }
         }
@@ -43,12 +38,6 @@ public class RemoteMethodBean {
         this.target = target;
         this.method = method;
         this.objects = objects;
-        this.onDestroyListener = new OnDestroyListener() {
-            @Override
-            public void onDestroy() {
-                setNull();
-            }
-        };
     }
 
     @MainThread
@@ -56,7 +45,6 @@ public class RemoteMethodBean {
         this.target = null;
         this.method = null;
         this.objects = null;
-        this.onDestroyListener = null;
     }
 
     public void doMethod() {
@@ -64,17 +52,12 @@ public class RemoteMethodBean {
             try {
                 method.setAccessible(true);
                 method.invoke(target, objects);
-                Log.e("test","RemoteMethodBean invoke");
+                Log.e("test","StartActivityRemoteMethodBean invoke");
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-            setNull();
-        }
-
-        synchronized (LoginUtil.sObjectLogin) {
-            LoginUtil.sObjectLogin.notifyAll();
         }
     }
 }

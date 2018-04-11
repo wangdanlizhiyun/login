@@ -12,7 +12,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.MainThread;
+import android.support.v4.util.ArrayMap;
 import android.util.LruCache;
 
 import java.lang.ref.WeakReference;
@@ -24,30 +26,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoginUtil {
 
-    public static Application mApplication;
-    static Class mLoginActivityClass;
-    static SharedPreferences mSharedPreferences = null;
-    private static RemoteMethodBean mRemoteMethodBean;
-    private static final Object mObjectRemoteMethod = new Object();
-    private static final Object mObjectSp = new Object();
+    public static Application sApplication;
+    static Class sLoginActivityClass;
+    static SharedPreferences sSharedPreferences = null;
+    private static final Object sObjectSp = new Object();
+    public static Object sObjectLogin = RemoteMethodBean.class;
 
-
-    public static void setmRemoteMethodBean(RemoteMethodBean mRemoteMethodBean) {
-        synchronized (mObjectRemoteMethod) {
-            LoginUtil.mRemoteMethodBean = mRemoteMethodBean;
-        }
-    }
 
     private static InternalHandler sHandler;
 
     public static void login(Boolean login) {
-        synchronized (mObjectSp) {
-            if (login) {
-                mSharedPreferences.edit().putBoolean("login", true).commit();
-                getMainHandler().sendMessage(getMainHandler().obtainMessage());
 
+        synchronized (sObjectSp) {
+            if (login) {
+                sSharedPreferences.edit().putBoolean("login", true).commit();
+                Message msg = getMainHandler().obtainMessage();
+                msg.what = What_DoRemoteMethod;
+                getMainHandler().removeMessages(What_DoRemoteMethod);
+                getMainHandler().sendMessageDelayed(msg, 350);
             } else {
-                mSharedPreferences.edit().putBoolean("login", false).commit();
+                sSharedPreferences.edit().putBoolean("login", false).commit();
             }
         }
     }
@@ -69,28 +67,27 @@ public class LoginUtil {
         @SuppressWarnings({"unchecked", "RawUseOfParameterizedType"})
         @Override
         public void handleMessage(Message msg) {
-            doRemoteMethod();
-        }
-    }
-    static LruCache<Integer,Object> sLruCacheObject = new LruCache<>(20);
-    public synchronized static Object getObjectForThread(int code){
-        if (sLruCacheObject.get(code) == null){
-            sLruCacheObject.put(code,new Object());
-        }
-        return sLruCacheObject.get(code);
-    }
+            switch (msg.what) {
+                case What_DoRemoteMethod:
+                    synchronized (sObjectLogin) {
+                        RemoteMethodBean.getInstance().doMethod();
+                        StartActivityRemoteMethodBean.getInstance().doMethod();
+                    }
+                    break;
+                case What_Login:
 
-    public static void doRemoteMethod() {
-        synchronized (mObjectRemoteMethod) {
-            if (mRemoteMethodBean != null) {
-                mRemoteMethodBean.doMethod();
+                    Activity activity = getActivity();
+                    if (activity != null) {
+                        activity.startActivity(new Intent(activity, sLoginActivityClass));
+                    }
+                    break;
             }
         }
     }
 
     public static synchronized Boolean isLogined() {
-        synchronized (mObjectSp) {
-            return mSharedPreferences.getBoolean("login", false);
+        synchronized (sObjectSp) {
+            return sSharedPreferences.getBoolean("login", false);
         }
     }
 
@@ -105,9 +102,9 @@ public class LoginUtil {
 
     @MainThread
     public static void init(Application application, Class loginActivityClass) {
-        mApplication = application;
-        mLoginActivityClass = loginActivityClass;
-        mSharedPreferences = application.getSharedPreferences("login",
+        sApplication = application;
+        sLoginActivityClass = loginActivityClass;
+        sSharedPreferences = application.getSharedPreferences("login",
                 Context.MODE_PRIVATE);
         application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
@@ -143,23 +140,36 @@ public class LoginUtil {
 
             @Override
             public void onActivityDestroyed(Activity activity) {
-
+                if (mActivityOnDestroyListenerArrayMap.get(activity) != null) {
+                    mActivityOnDestroyListenerArrayMap.get(activity).onDestroy();
+                }
             }
         });
         HookAmsUtil.hookStartActivity();
         HookAmsUtil.hookSystemHandler();
     }
 
-    public static void gotoLogin() {
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.startActivity(new Intent(activity, mLoginActivityClass));
+    static ArrayMap<Activity, OnDestroyListener> mActivityOnDestroyListenerArrayMap = new ArrayMap<>();
+
+    public static void putDestoryListener(Activity activity, OnDestroyListener onDestroyListener) {
+        if (activity != null && onDestroyListener != null) {
+            mActivityOnDestroyListenerArrayMap.put(activity, onDestroyListener);
         }
+    }
+
+    private static final int What_Login = 0;
+    private static final int What_DoRemoteMethod = 1;
+
+    public static void gotoLogin() {
+        Message msg = getMainHandler().obtainMessage();
+        msg.what = What_Login;
+        getMainHandler().removeMessages(What_Login);
+        getMainHandler().sendMessageDelayed(msg, 350);
     }
 
     public static Class getProxyActivityClass() {
         try {
-            ActivityInfo[] activities = LoginUtil.mApplication.getPackageManager().getPackageInfo(LoginUtil.mApplication.getPackageName(), PackageManager.GET_ACTIVITIES).activities;
+            ActivityInfo[] activities = LoginUtil.sApplication.getPackageManager().getPackageInfo(LoginUtil.sApplication.getPackageName(), PackageManager.GET_ACTIVITIES).activities;
             if (activities != null && activities.length > 0) {
                 return Thread.currentThread().getContextClassLoader().loadClass(activities[0].name);
             }

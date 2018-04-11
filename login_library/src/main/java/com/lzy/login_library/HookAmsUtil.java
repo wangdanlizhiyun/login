@@ -71,14 +71,14 @@ public class HookAmsUtil {
                 }
                 if (intent != null) {
                     if (hasLoginAnnotation(intent.getComponent().getClassName())){
-                        LoginUtil.setmRemoteMethodBean(new RemoteMethodBean(iActivityManagerObj,method,args));
+                        StartActivityRemoteMethodBean.getInstance().setMessage(iActivityManagerObj,method,args);
                     }else {
-                        LoginUtil.setmRemoteMethodBean(null);
+                        StartActivityRemoteMethodBean.getInstance().setNull();
                     }
                     intent.putExtra("component", intent.getComponent());
                     Class proxyActicityClass = LoginUtil.getProxyActivityClass();
                     if (proxyActicityClass != null){
-                        intent.setComponent(new ComponentName(LoginUtil.mApplication, proxyActicityClass));
+                        intent.setComponent(new ComponentName(LoginUtil.sApplication, proxyActicityClass));
                     }
                 }
             }
@@ -130,7 +130,7 @@ public class HookAmsUtil {
                     Boolean isNeedGotoLogin = false;
                     isNeedGotoLogin = !LoginUtil.isLogined() && hasLoginAnnotation(componentName.getClassName());
                     if (isNeedGotoLogin) {
-                        intent.setComponent(new ComponentName(LoginUtil.mApplication, LoginUtil.mLoginActivityClass));
+                        intent.setComponent(new ComponentName(LoginUtil.sApplication, LoginUtil.sLoginActivityClass));
                     } else {
                         intent.setComponent(componentName);
                     }

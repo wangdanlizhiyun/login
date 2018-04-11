@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">login_library</string>
+    <item type="id" name="tag_ondestroy"/>
 </resources>
